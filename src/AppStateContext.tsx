@@ -4,6 +4,7 @@ import { findItemIndexById } from './utils/findItemIndexById';
 
 interface AppStateContextProps {
   state: AppState;
+  dispatch: any;
 }
 
 const AppStateContext = createContext<AppStateContextProps>(
