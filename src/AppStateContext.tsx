@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { findItemIndexById } from './utils/findItemIndexById';
 import { moveItem } from './utils/moveItem';
 import { DragItem } from './DragItem';
-import { DndProvider } from 'react-dnd';
+import { Console } from 'console';
 
 interface AppStateContextProps {
   state: AppState;
@@ -77,6 +77,7 @@ const appStateReducer = (state: AppState, action: Action): AppState => {
 };
 
 const appData: AppState = {
+  draggedItem: undefined,
   lists: [
     {
       id: '0',
@@ -108,6 +109,7 @@ interface List {
 }
 
 export interface AppState {
+  draggedItem: DragItem | undefined;
   lists: List[];
 }
 
