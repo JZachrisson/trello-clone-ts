@@ -5,9 +5,24 @@ import { moveItem } from './utils/moveItem';
 import { DragItem } from './DragItem';
 import { Console } from 'console';
 
+interface Task {
+  id: string;
+  text: string;
+}
+
+interface List {
+  id: string;
+  text: string;
+  tasks: Task[];
+}
+
+export interface AppState {
+  draggedItem: DragItem | undefined;
+  lists: List[];
+}
 interface AppStateContextProps {
   state: AppState;
-  dispatch: any;
+  dispatch: React.Dispatch<Action>;
 }
 
 const AppStateContext = createContext<AppStateContextProps>(
@@ -96,22 +111,6 @@ const appData: AppState = {
     },
   ],
 };
-
-interface Task {
-  id: string;
-  text: string;
-}
-
-interface List {
-  id: string;
-  text: string;
-  tasks: Task[];
-}
-
-export interface AppState {
-  draggedItem: DragItem | undefined;
-  lists: List[];
-}
 
 export const useAppState = () => {
   return useContext(AppStateContext);

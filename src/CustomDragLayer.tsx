@@ -27,8 +27,14 @@ export const CustomDragLayer: React.FC = () => {
 
   return isDragging ? (
     <CustomDragLayerContainer>
-      <div style={getItemStyles(currentOffset)}></div>
-      <Column id={item.id} text={item.text} index={item.index} />
+      <div style={getItemStyles(currentOffset)}>
+        <Column
+          id={item.id}
+          text={item.text}
+          index={item.index}
+          isPreview={true}
+        />
+      </div>
     </CustomDragLayerContainer>
   ) : null;
 };
