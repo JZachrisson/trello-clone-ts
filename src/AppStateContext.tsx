@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
   findItemIndexById,
@@ -7,8 +7,10 @@ import {
   overrideItemAtIndex,
   insertItemAtIndex,
 } from './utils/arrayUtils';
+import { withData } from './withData';
 
 import { DragItem } from './DragItem';
+import { save } from './api';
 
 interface Task {
   id: string;
@@ -171,16 +173,26 @@ export const useAppState = () => {
   return useContext(AppStateContext);
 };
 
-export const AppStateProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const [state, dispatch] = useReducer(appStateReducer, appData);
-  return (
-    <AppStateContext.Provider
-      value={{
-        state,
-        dispatch,
-      }}
-    >
-      {children}
-    </AppStateContext.Provider>
-  );
-};
+export const AppStateProvider = withData(
+  ({
+    children,
+    initialState,
+  }: React.PropsWithChildren<{ initialState: AppState }>) => {
+    const [state, dispatch] = useReducer(appStateReducer, initialState);
+
+    useEffect(() => {
+      save(state);
+    }, [state]);
+
+    return (
+      <AppStateContext.Provider
+        value={{
+          state,
+          dispatch,
+        }}
+      >
+        {children}
+      </AppStateContext.Provider>
+    );
+  }
+);
