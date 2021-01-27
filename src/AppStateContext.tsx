@@ -1,9 +1,14 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { findItemIndexById } from './utils/findItemIndexById';
-import { moveItem } from './utils/moveItem';
+import {
+  findItemIndexById,
+  moveItem,
+  removeItemAtIndex,
+  overrideItemAtIndex,
+  insertItemAtIndex,
+} from './utils/arrayUtils';
+
 import { DragItem } from './DragItem';
-import { Console } from 'console';
 
 interface Task {
   id: string;
@@ -51,6 +56,15 @@ type Action =
   | {
       type: 'SET_DRAGGED_ITEM';
       payload: DragItem | undefined;
+    }
+  | {
+      type: 'MOVE_TASK';
+      payload: {
+        dragIndex: number;
+        hoverIndex: number;
+        sourceColumn: string;
+        targetColumn: string;
+      };
     };
 
 const appStateReducer = (state: AppState, action: Action): AppState => {
@@ -84,6 +98,47 @@ const appStateReducer = (state: AppState, action: Action): AppState => {
     }
     case 'SET_DRAGGED_ITEM': {
       return { ...state, draggedItem: action.payload };
+    }
+    case 'MOVE_TASK': {
+      const {
+        dragIndex,
+        hoverIndex,
+        sourceColumn,
+        targetColumn,
+      } = action.payload;
+      const sourceListIndex = findItemIndexById(state.lists, sourceColumn);
+      const targetListIndex = findItemIndexById(state.lists, targetColumn);
+      const sourceList = state.lists[sourceListIndex];
+      const task = sourceList.tasks[dragIndex];
+
+      const updatedSourceList = {
+        ...sourceList,
+        tasks: removeItemAtIndex(sourceList.tasks, dragIndex),
+      };
+
+      const stateWithUpdatedSourceList = {
+        ...state,
+        lists: overrideItemAtIndex(
+          state.lists,
+          updatedSourceList,
+          sourceListIndex
+        ),
+      };
+
+      const targetList = stateWithUpdatedSourceList.lists[targetListIndex];
+      const updatedTargetList = {
+        ...targetList,
+        tasks: insertItemAtIndex(targetList.tasks, task, hoverIndex),
+      };
+
+      return {
+        ...stateWithUpdatedSourceList,
+        lists: overrideItemAtIndex(
+          stateWithUpdatedSourceList.lists,
+          updatedTargetList,
+          targetListIndex
+        ),
+      };
     }
     default: {
       return state;
